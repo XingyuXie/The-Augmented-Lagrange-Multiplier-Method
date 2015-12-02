@@ -1,0 +1,177 @@
+
+\documentclass{article}
+  \usepackage{amsmath}
+  \usepackage{amssymb}
+\begin{document}
+
+\section{Original Problem}
+  The original problem is:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{S, Y} {\parallel X - ASY\parallel}_F^2 + \alpha{\parallel Y\parallel}_F^2\\
+    s.t. \;\; S^TS = I, \; S \geq 0
+\end{array}
+\end{eqnarray}
+where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$,$\mathbf{A} \in \mathbf{R}^{Dim\times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is a select matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
+
+\section{Transformed Problem}
+The original problem is strongly NP-hard and also difficult to solve approximately.A popular method for this original problem is the Augmented Lagrange Multiplier Method(ALM).The original problem is transformed below:
+%{\setlength\arraycolsep{2pt}
+\begin{eqnarray}
+&& \begin{array}{lll}
+\mathop{\min}\limits_{Y,S,Q,J,Z_1,Z_2 } && {\parallel X - ASY\parallel}_F^2  + \alpha{\parallel Y\parallel}_F^2 + <Z_1,S-Q> \\ && + \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2
+ + <Z_2,S-J> + \frac{1}{2}\mu{\parallel S - J\parallel}_F^2
+\end{array}\\ \nonumber \\
+&& \begin{array}{lll}
+s.t. \;\; S = Q , \; S = J , \; Q^TQ = I , \; J \geq 0 \nonumber
+\end{array}
+\end{eqnarray}\\
+where $\mathbf{S, Q, J} \in \mathbf{R}^{m\times k}$.
+\section{Solution}
+The ALM can be decomposed into 4 subproblems.All this 4 subproblems have close-formed solutions.So we can do the optimization by 4 steps.\\
+
+\begin{flushleft}
+\textbf{Steps 1}:\;\;Fix $\mathop{S,Q,J}$ to optimize $\mathop{Y}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{Y} {\parallel X - ASY\parallel}_F^2 + \alpha{\parallel Y\parallel}_F^2\\
+\end{array}
+\end{eqnarray}
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    S^TA^T(ASY-X) +\alpha Y = 0 \nonumber \\\\
+    (S^TA^TASY+\alpha I) = S^TA^TX \nonumber \\\\
+    Y = (S^TA^TASY+\alpha I)^{-1}S^TA^TX \nonumber
+\end{array}
+\end{eqnarray}
+Now we can get Y.\\
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 2}:\;\;Fix $\mathop{Y,Q,J}$ to optimize $\mathop{S}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{S} && {\parallel X - ASY\parallel}_F^2 + <Z_1,S-Q> + \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 \\ &&+ <Z_2,S-J> + \frac{1}{2}\mu{\parallel S - J \parallel}_F^2
+\end{array}
+\end{eqnarray}
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    2A^T(ASY - X)Y^T +Z_1 + \mu (S-Q) + Z_2 + \mu(S-J)= 0 \nonumber \\\\
+    2A^TASYY^T + 2\mu S = 2A^TXY^T + \mu (Q+J)
+\\
+\end{array}
+\end{eqnarray}
+Use the property of $\mathop{Kronecker Product}$.
+\begin{eqnarray}
+\begin{array}{lll}
+\\
+    Vec(C\cdot S\cdot B) = (B^T \bigotimes C)\cdot Vec(S) \nonumber
+\\
+\end{array}
+\end{eqnarray}
+We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    2(YY^T \bigotimes A^TA)\cdot Vec(S) + 2\mu Vec(S)  = Vec(2A^TXY^T + \mu (Q+J)) \nonumber\\\\
+    2(YY^T \bigotimes A^TA + \mu I)\cdot Vec(S) = Vec(2A^TXY^T + \mu (Q+J))  \nonumber  \\\\
+    Vec(S) = 2(YY^T \bigotimes A^TA + \mu I)^{-1}\cdot Vec(2A^TXY^T + \mu (Q+J))
+\end{array}
+\end{eqnarray}
+Now We need to convert $\mathop{Vector(S)}$ back to a matrix which is $\mathop{m\times k}$.
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 3}:\;\;Fix $\mathop{S,Y,J}$ to optimize $\mathop{Q}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{Q} <Z_1,S-Q> + \frac{1}{2}\mu {\parallel S - Q \parallel}_F^2  \\
+    s.t. \;\; Q^TQ = I
+\end{array}
+\end{eqnarray}
+It equals to:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{Q} <Z_1,-Q> + \mu <S,Q>  \\
+    s.t. \;\; Q^TQ = I \\
+\end{array}
+\end{eqnarray}\\
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\max}\limits_{Q} <Q,\mu S+Z_1>  \\
+    s.t. \;\; Q^TQ = I
+\end{array}
+\end{eqnarray}\\
+Use the proposition of matrix:
+\end{flushleft}
+\textbf{The dual norm of the operator norm $\parallel \cdot \parallel$ in $\mathop{R^{m\times n}}$ is the nuclear norm ${\parallel \cdot \parallel}_{\ast}$.}\\
+$\Longrightarrow $
+\begin{eqnarray}
+\begin{array}{lll}
+    {\parallel X\parallel}_{\ast} := \mathop{\max}\limits_{Y} \{ <X, Y> \;\; : \;\; \parallel Y\parallel \leq 1 \}
+\end{array}
+\end{eqnarray}\\
+Now let $\mathop{X} = U\Sigma V^T $ be a \textbf{thin} singular value decomposition of the $m \times n$ matrix $\mathop{X}$,where $\mathop{U}$ is an $m \times n$ matrix and $U^T \cdot U=I$, but $U \cdot U^T \neq I$. V is an $n \times n$ orthogonal matrix which $V \cdot V^T=I$.\; $\mathop{\Sigma}$ is an $n\times n$ matrix.Let $Y :=U\cdot V^T $,$\parallel Y \parallel = 1$ and $Tr(Y^T \cdot X) = Tr(VU^T \cdot U\Sigma V^T)=Tr(\Sigma)={\parallel X\parallel}_{\ast}$. And can get $Y^T\cdot Y=I$.\\
+So from this derivation, We can also do a \textbf{thin} singular value decomposition of $\mu S+Z_1 $:\\
+\begin{eqnarray}
+\begin{array}{lll}
+\mathop{\mu S+Z_1 = U \Sigma V^T} \nonumber \\\\
+Q = U\cdot V^T
+\end{array}
+\end{eqnarray}
+
+\begin{flushleft}
+\textbf{Steps 4}:\;\;Fix $\mathop{S,Y,Q}$ to optimize $\mathop{J}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} <Z_2,S-J> + \frac{1}{2}\mu {\parallel S - J \parallel}_F^2  \\
+    s.t. \;\; J \geq 0\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} \frac{2}{\mu} <Z_2,S-J> + {\parallel S - J \parallel}_F^2  + \frac{1}{\mu}{\parallel Z_2\parallel}_F^2\\
+    s.t. \;\; J \geq 0\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} {\parallel J-(S+ \frac{Z_2}{\mu} )\parallel}_F^2\\
+    s.t. \;\; J \geq I\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    J=\frac{1}{2}\cdot\ [abs(S+ \frac{Z_2}{\mu})+ (S+ \frac{Z_2}{\mu})]
+\end{array}
+\end{eqnarray}
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 5}:\;\;Do some updates:
+\begin{eqnarray}
+\begin{array}{l}
+Z_1 = Z_1 + \mu \cdot (S-Q)\\
+Z_2 = Z_2 + \mu \cdot (S-J)\\
+\mu = \rho \times \mu
+\end{array}
+\end{eqnarray}\\
+where $\rho = 1.1 $.
+\end{flushleft}
+
+\section{Termination Conditions}
+The algorithm will stop when the conditions are both satisfied:
+\begin{eqnarray}
+\begin{array}{l}
+\mathop{\parallel S-J \parallel}_F < \varepsilon \\\\
+\mathop{\parallel S-Q \parallel}_F < \varepsilon \\
+\end{array}
+\end{eqnarray}\\
+where $\varepsilon = 10^{-8}$.\\
+
+\end{document}
