@@ -178,8 +178,8 @@ where $\rho = 1.1 $.
 The algorithm will stop when the conditions are both satisfied:
 \begin{eqnarray}
 \begin{array}{l}
-\mathop{\parallel S-J \parallel}_\infty < \varepsilon \\\\
-\mathop{\parallel S-Q \parallel}_\infty < \varepsilon \\
+\mathop{\parallel S-J \parallel}_/inf < \varepsilon \\\\
+\frac{1}{m \times k} \cdot \mathop{\parallel S-Q \parallel}_F < \varepsilon \\
 \end{array}
 \end{eqnarray}\\
 where $\varepsilon = 10^{-8}$.\\

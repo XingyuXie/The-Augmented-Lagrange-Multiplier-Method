@@ -12,7 +12,7 @@
     s.t. \;\; S^TS = I, \; S_{ij} \in \{0,1\}
 \end{array}
 \end{eqnarray}
-where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$,$\mathbf{A} \in \mathbf{R}^{Dim\times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is a select matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
+where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$, $\mathbf{A} \in \mathbf{R}^{Dim \times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is the selection matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
 
 \section{Relaxed Problem}
   The original problem is strongly NP-hard and also difficult to solve approximately.It is quite similar to the below one by relax it's constraint\;:
@@ -22,78 +22,92 @@ where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$,$\mathbf{A} \in \mathbf{R}^{Dim\
     s.t. \;\; S^TS = I, \; S \geq 0
 \end{array}
 \end{eqnarray}
-where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$,$\mathbf{A} \in \mathbf{R}^{Dim\times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is a select matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
 
-\section{Transformed Problem}
-The original problem is strongly NP-hard and also difficult to solve approximately.A popular method for this original problem is the Augmented Lagrange Multiplier Method(ALM).The original problem is transformed below:
+The problem above is equal to \;:
+\begin{eqnarray}
+&& \begin{array}{lll}
+\mathop{\min}\limits_{Y,S,K,Q,J,Z_1,Z_2,Z_3 } && {\parallel X - KY\parallel}_F^2  + \alpha{\parallel Y\parallel}_F^2
+\end{array}\\ \nonumber \\
+&& \begin{array}{lll}
+s.t. \;\; A\cdot S =K , \; S = Q , \; S = J , \; Q^TQ = I , \; J \geq 0 \nonumber
+\end{array}
+\end{eqnarray}\\
+where $\mathbf{X} \in \mathbf{R}^{Dim\times n}$, $\mathbf{A} \in \mathbf{R}^{Dim \times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is the selection matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
+\section{Solution}
+A popular method for this above problem is the Augmented Lagrange Multiplier Method(ALM).The original problem is transformed below\;:
 %{\setlength\arraycolsep{2pt}
 \begin{eqnarray}
 && \begin{array}{lll}
-\mathop{\min}\limits_{Y,S,Q,J,Z_1,Z_2 } && {\parallel X - ASY\parallel}_F^2  + \alpha{\parallel Y\parallel}_F^2 + <Z_1,S-Q> \\ && + \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2
- + <Z_2,S-J> + \frac{1}{2}\mu{\parallel S - J\parallel}_F^2
+\mathop{\min}\limits_{Y,S,k,Q,J,Z_1,Z_2,Z_3 } && {\parallel X - KY\parallel}_F^2  + \alpha{\parallel Y\parallel}_F^2 + <Z_1,S-Q> \\\\ && + <Z_2,S-J> + <Z_3,X\cdot S-K> \\\\ && + \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 +\frac{1}{2}\mu{\parallel S - J\parallel}_F^2 \\\\ && + \frac{1}{2}\mu{\parallel X\cdot S - K\parallel}_F^2
 \end{array}\\ \nonumber \\
 && \begin{array}{lll}
-s.t. \;\; S = Q , \; S = J , \; Q^TQ = I , \; J \geq 0 \nonumber
+s.t. \;\; A\cdot S =K , \; S = Q , \; S = J , \; Q^TQ = I , \; J \geq 0 \nonumber
 \end{array}
 \end{eqnarray}\\
-where $\mathbf{S, Q, J} \in \mathbf{R}^{m\times k}$.
-\section{Solution}
+where $\mathbf{K} \in \mathbf{R}^{Dim \times k}$,And $\mathbf{S,Q,J} \in \mathbf{R}^{m \times k}$.
+
+
 The ALM can be decomposed into 4 subproblems.All this 4 subproblems have close-formed solutions.So we can do the optimization by 4 steps.\\
 
 \begin{flushleft}
-\textbf{Steps 1}:\;\;Fix $\mathop{S,Q,J}$ to optimize $\mathop{Y}$ and ignore the constant items, We can get:
+\textbf{Steps 1}:\;\;Fix $\mathop{S,K,Q,J,Z_1,Z_2,Z_3}$ to optimize $\mathop{Y}$ and ignore the constant items, We can get:
 \begin{eqnarray}
 \begin{array}{l}
-    \mathop{\min}\limits_{Y} {\parallel X - ASY\parallel}_F^2 + \alpha{\parallel Y\parallel}_F^2\\
+    \mathop{\min}\limits_{Y} {\parallel X - KY\parallel}_F^2 + \alpha{\parallel Y\parallel}_F^2\\
 \end{array}
 \end{eqnarray}
 We can get the first-order differential of this formulation,and let it to be zero:
 \begin{eqnarray}
 \begin{array}{lll}
-    S^TA^T(ASY-X) +\alpha Y = 0 \nonumber \\\\
-    (S^TA^TASY+\alpha I) = S^TA^TX \nonumber \\\\
-    Y = (S^TA^TASY+\alpha I)^{-1}S^TA^TX \nonumber
+    K^T\cdot (KY-X) +\alpha Y = 0 \nonumber \\\\
+    (K^TK +\alpha I)\cdot Y = K^T\cdot X \nonumber \\\\
+    Y = (K^TK+\alpha I)^{-1}K^TX \nonumber
 \end{array}
 \end{eqnarray}
 Now we can get Y.\\
 \end{flushleft}
 
+
 \begin{flushleft}
-\textbf{Steps 2}:\;\;Fix $\mathop{Y,Q,J}$ to optimize $\mathop{S}$ and ignore the constant items, We can get:
+\textbf{Steps 2}:\;\;Fix $\mathop{S,Y,Q,J,Z_1,Z_2,Z_3}$ to optimize $\mathop{K}$ and ignore the constant items, We can get:
 \begin{eqnarray}
 \begin{array}{lll}
-    \mathop{\min}\limits_{S} && {\parallel X - ASY\parallel}_F^2 + <Z_1,S-Q> + \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 \\ &&+ <Z_2,S-J> + \frac{1}{2}\mu{\parallel S - J \parallel}_F^2
+    \mathop{\min}\limits_{K} && {\parallel X - KY\parallel}_F^2 + <Z_3,AS-K>  +\; \frac{1}{2}\mu{\parallel AS - K \parallel}_F^2
 \end{array}
-\end{eqnarray}
+\end{eqnarray}\\
 We can get the first-order differential of this formulation,and let it to be zero:
 \begin{eqnarray}
 \begin{array}{lll}
-    2A^T(ASY - X)Y^T +Z_1 + \mu (S-Q) + Z_2 + \mu(S-J)= 0 \nonumber \\\\
-    2A^TASYY^T + 2\mu S = 2A^TXY^T + \mu (Q+J)
-\\
+    2(KY - X)Y^T  - Z_3 + \mu (K-AS) = 0 \nonumber \\\\
+    2K\cdot Y\cdot Y^T + \mu K = 2XY^T + \mu AS +Z_3\\\\
+    K(2 YY^T +\mu I) = 2XY^T + \mu AS + Z_3\\\\
+    K = (2XY^T + \mu AS +Z_3) \cdot (2YY^T +\mu I)^{-1}\\
 \end{array}
 \end{eqnarray}
-Use the property of $\mathop{Kronecker Product}$.
-\begin{eqnarray}
-\begin{array}{lll}
-\\
-    Vec(C\cdot S\cdot B) = (B^T \bigotimes C)\cdot Vec(S) \nonumber
-\\
-\end{array}
-\end{eqnarray}
-We can get:
-\begin{eqnarray}
-\begin{array}{lll}
-    2(YY^T \bigotimes A^TA)\cdot Vec(S) + 2\mu Vec(S)  = Vec(2A^TXY^T + \mu (Q+J)) \nonumber\\\\
-    2(YY^T \bigotimes A^TA + \mu I)\cdot Vec(S) = Vec(2A^TXY^T + \mu (Q+J))  \nonumber  \\\\
-    Vec(S) = 2(YY^T \bigotimes A^TA + \mu I)^{-1}\cdot Vec(2A^TXY^T + \mu (Q+J))
-\end{array}
-\end{eqnarray}
-Now We need to convert $\mathop{Vector(S)}$ back to a matrix which is $\mathop{m\times k}$.
+Now we can get K.\\
 \end{flushleft}
 
 \begin{flushleft}
-\textbf{Steps 3}:\;\;Fix $\mathop{S,Y,J}$ to optimize $\mathop{Q}$ and ignore the constant items, We can get:
+\textbf{Steps 3}:\;\;Fix $\mathop{K,Y,Q,J,Z_1,Z_2,Z_3}$ to optimize $\mathop{S}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{S} <Z_1,S-Q> + <Z_2,S-J> + <Z_3,AS-K> \\\\ +\;\frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 +\;\frac{1}{2}\mu{\parallel S - J \parallel}_F^2
+    +\;\frac{1}{2}\mu{\parallel AS - K \parallel}_F^2
+\end{array}
+\end{eqnarray}\\
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    Z_1 + Z_2 + A^T\cdot Z_3 + \mu(S-Q) + \mu(S-J) +\mu A^T(AS-K) = 0 \nonumber \\\\
+    2\mu \cdot S+ \mu\cdot A^T AS = \mu (A^TK+Q+J) - A^T\cdot Z_3 -Z_1-Z_2\\\\
+    S = (2I+A^TA)^{-1} \cdot (A^TK + Q +J - \frac{1}{\mu} \cdot  (A^T \cdot Z_3+Z_1 +Z_2))\\\\
+\end{array}
+\end{eqnarray}
+Now we can get S.\\
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 4}:\;\;Fix $\mathop{K,Y,S,J,Z_1,Z_2,Z_3}$ to optimize $\mathop{Q}$ and ignore the constant items, We can get:
 \begin{eqnarray}
 \begin{array}{l}
     \mathop{\min}\limits_{Q} <Z_1,S-Q> + \frac{1}{2}\mu {\parallel S - Q \parallel}_F^2  \\
@@ -103,7 +117,7 @@ Now We need to convert $\mathop{Vector(S)}$ back to a matrix which is $\mathop{m
 It equals to:
 \begin{eqnarray}
 \begin{array}{lll}
-    \mathop{\min}\limits_{Q} <Z_1,-Q> + \mu <S,Q>  \\
+    \mathop{\min}\limits_{Q} <Z_1,-Q> - \mu <S,Q>  \\
     s.t. \;\; Q^TQ = I \\
 \end{array}
 \end{eqnarray}\\
@@ -133,7 +147,7 @@ Q = U\cdot V^T
 \end{eqnarray}
 
 \begin{flushleft}
-\textbf{Steps 4}:\;\;Fix $\mathop{S,Y,Q}$ to optimize $\mathop{J}$ and ignore the constant items, We can get:
+\textbf{Steps 5}:\;\;Fix $\mathop{K,Y,S,Q,Z_1,Z_2,Z_3}$ to optimize $\mathop{J}$ and ignore the constant items, We can get:
 \begin{eqnarray}
 \begin{array}{l}
     \mathop{\min}\limits_{J} <Z_2,S-J> + \frac{1}{2}\mu {\parallel S - J \parallel}_F^2  \\
@@ -151,7 +165,7 @@ $\Longleftrightarrow$
 \begin{eqnarray}
 \begin{array}{l}
     \mathop{\min}\limits_{J} {\parallel J-(S+ \frac{Z_2}{\mu} )\parallel}_F^2\\
-    s.t. \;\; J \geq I\\
+    s.t. \;\; J \geq 0\\
 \end{array}
 \end{eqnarray}
 $\Longleftrightarrow$
@@ -163,11 +177,12 @@ $\Longleftrightarrow$
 \end{flushleft}
 
 \begin{flushleft}
-\textbf{Steps 5}:\;\;Do some updates:
+\textbf{Steps 6}:\;\;Do some updates:
 \begin{eqnarray}
 \begin{array}{l}
-Z_1 = Z_1 + \mu \cdot (S-Q)\\
-Z_2 = Z_2 + \mu \cdot (S-J)\\
+Z_1 = Z_1 + \mu \cdot (S-Q)\\\\
+Z_2 = Z_2 + \mu \cdot (S-J)\\\\
+Z_3 = Z_3 + \mu (X\cdot S - K)\\\\
 \mu = \rho \times \mu
 \end{array}
 \end{eqnarray}\\
@@ -178,8 +193,9 @@ where $\rho = 1.1 $.
 The algorithm will stop when the conditions are both satisfied:
 \begin{eqnarray}
 \begin{array}{l}
+\mathop{\parallel S-Q \parallel}_\infty < \varepsilon \\\\
 \mathop{\parallel S-J \parallel}_\infty < \varepsilon \\\\
-\mathop{\parallel S-Q \parallel}_\infty < \varepsilon \\
+\mathop{\parallel X\cdot S-K \parallel}_F < \varepsilon \times \mathop{\parallel X \parallel}_F
 \end{array}
 \end{eqnarray}\\
 where $\varepsilon = 10^{-8}$.\\
