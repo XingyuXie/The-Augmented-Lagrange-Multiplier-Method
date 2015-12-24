@@ -1,0 +1,243 @@
+
+\documentclass{article}
+  \usepackage{amsmath}
+  \usepackage{amssymb}
+\begin{document}
+
+\section{Original Problem}
+  The original problem is\;:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{S, Y} {\parallel X - ASY\parallel}_F^2 \\
+    s.t. \;\; S^TS = I, \; S_{ij} \in \{0,1\}, \; Y_i \in \Omega
+\end{array}
+\end{eqnarray}
+$\Omega$ is a set in $\mathbf{R}^{n}$,it equals to ${e_1,e_2,...,e_n}$,where $e_i$ is the i-th column of the identity matrix.\\
+where $Y_i$ is a column of Matrix $\mathbf{Y}$,$\mathbf{X} \in \mathbf{R}^{Dim\times n}$, $\mathbf{A} \in \mathbf{R}^{Dim \times m}$, $\mathbf{Y} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is the selection matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
+
+\section{Relaxed Problem}
+  The original problem is strongly NP-hard and also difficult to solve approximately.It is quite similar to the below one by relax it's constraint\;:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{S, Y} {\parallel X - ASY\parallel}_F^2 \\
+    s.t. \;\; S^TS = I, \; S \geq 0 \; Y_i \in \Omega
+\end{array}
+\end{eqnarray}
+
+The problem above is equal to \;:
+\begin{eqnarray}
+&& \begin{array}{lll}
+\mathop{\min}\limits_{Y,S,} && {\parallel X - DM\parallel}_F^2
+\end{array}\\ \nonumber \\
+&& \begin{array}{lll}
+s.t. \;\; A\cdot S =D  , \; Y = M , \; S = Q , \; S = J , \; Q^TQ = I , \; J \geq 0 , \; Y_i \in \Omega \nonumber
+\end{array}
+\end{eqnarray}\\
+where $Y_i$ is a column of Matrix $\mathbf{Y}$ , $\mathbf{X} \in \mathbf{R}^{Dim\times n}$, $\mathbf{A} \in \mathbf{R}^{Dim \times m}$, $\mathbf{Y,M} \in \mathbf{R}^{k\times n}$.And $\mathbf{S}$ is the selection matrix, $\mathbf{S} \in \mathbf{R}^{m\times k}$,$m \geq k$.
+\section{Solution}
+A popular method for this above problem is the Augmented Lagrange Multiplier Method(ALM).The original problem is transformed below\;:
+%{\setlength\arraycolsep{2pt}
+\begin{eqnarray}
+&& \begin{array}{lll}
+\mathop{\min}\limits_{Y,S,D,Q,J} && {\parallel X - DM\parallel}_F^2  +  <Z_1,S-Q>  + <Z_2,S-J> \\\\ && + <Z_3,AS-D>  + <Z_4 , Y-M> \\\\ &&
++ \frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 +\frac{1}{2}\mu{\parallel S - J\parallel}_F^2 \\\\ && + \frac{1}{2}\mu{\parallel AS - D\parallel}_F^2 +
+\frac{1}{2}\mu{\parallel Y - M\parallel}_F^2 \\
+\end{array}\\ \nonumber \\
+&& \begin{array}{lll}
+s.t. \;\; Q^TQ = I , \; J \geq 0  , \; Y_i \in \Omega\nonumber
+\end{array}
+\end{eqnarray}\\
+where $Y_i$ is a column of Matrix $\mathbf{Y}$, $\mathbf{D} \in \mathbf{R}^{Dim \times k}$ and $\mathbf{S,Q,J} \in \mathbf{R}^{m \times k}$, $\mathbf{M} \in \mathbf{R}^{k \times n}$.
+
+
+The ALM can be decomposed into 6 subproblems.All this 6 subproblems have close-formed solutions.So we can do the optimization by 6 steps.\\
+
+\begin{flushleft}
+\textbf{Steps 1}:\;\;Fix $\mathop{S,D,Q,J,M,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{Y}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+%    \mathop{\min}\limits_{Y} {\parallel X - KY\parallel}_F^2 + \alpha{\parallel Y\parallel}_F^2\\
+      \mathop{\min}\limits_{Y} <Z_4,Y-M> + \frac{1}{2}\mu{\parallel Y - M\parallel}_F^2\\\\
+      s.t. \;\;  Y_i \in \Omega
+\end{array}
+\end{eqnarray}
+$\Longrightarrow $
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{Y} {\parallel Y - (M - \frac{Z_4}{\mu})\parallel}_F^2\\\\
+      s.t. \;\;  Y_i \in \Omega
+\end{array}
+\end{eqnarray}
+$\Longrightarrow $
+\begin{eqnarray}
+\begin{array}{l}
+$$ Y_{ij}=
+\begin{cases}
+1& \text{j = t}\\
+0& \text{j $\neq$ t}
+\end{cases}$$
+\end{array}
+\end{eqnarray}
+where $\mathbf{t}$ is the index of max member of the i-th column of matrix $\mathbf{M - \frac{Z_4}{\mu}}$ and $\mathbf{Y_{ij}}$ is the j-th member of i-th column of matrix $\mathbf{Y}$.\\
+
+Now we get Y.\\
+\end{flushleft}
+
+
+\begin{flushleft}
+\textbf{Steps 2}:\;\;Fix $\mathop{S,M,Y,Q,J,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{D}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{D} && {\parallel X - DY\parallel}_F^2 + <Z_3,AS-D>  +\; \frac{1}{2}\mu{\parallel AS - D \parallel}_F^2
+\end{array}
+\end{eqnarray}\\
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    2(DY - X)Y^T  - Z_3 + \mu (D-AS) = 0 \nonumber \\\\
+    2DY\cdot Y^T + \mu D = 2XY^T + \mu AS +Z_3\\\\
+    D(2 YY^T +\mu I) = 2XY^T + \mu AS + Z_3\\\\
+    D = (2XY^T + \mu AS +Z_3) \cdot (2YY^T +\mu I)^{-1}\\
+\end{array}
+\end{eqnarray}
+Now we can get D.\\
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 3}:\;\;Fix $\mathop{D,Y,M,Q,J,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{S}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{S} <Z_1,S-Q> + <Z_2,S-J> + <Z_3,AS-D> \\\\ +\;\frac{1}{2}\mu{\parallel S - Q\parallel}_F^2 +\;\frac{1}{2}\mu{\parallel S - J \parallel}_F^2
+    +\;\frac{1}{2}\mu{\parallel AS - D \parallel}_F^2
+\end{array}
+\end{eqnarray}\\
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    Z_1 + Z_2 + A^T\cdot Z_3 + \mu(S-Q) + \mu(S-J) +\mu A^T(AS-D) = 0 \nonumber \\\\
+    2\mu \cdot S+ \mu\cdot A^T AS = \mu (A^TD+Q+J) - A^T\cdot Z_3 -Z_1-Z_2\\\\
+    S = (2I+A^TA)^{-1} \cdot (A^TD + Q +J) - \frac{1}{\mu} \cdot  (A^T \cdot Z_3+Z_1 +Z_2))\\\\
+\end{array}
+\end{eqnarray}
+Now we can get S.\\
+\end{flushleft}
+
+
+\begin{flushleft}
+\textbf{Steps 4}:\;\;Fix $\mathop{D,Y,S,Q,J,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{M}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{M} {\parallel X - DM \parallel}_F^2 + <Z_4, Y-M> + \frac{1}{2}\mu {\parallel Y - M \parallel}_F^2
+\end{array}
+\end{eqnarray}\\
+We can get the first-order differential of this formulation,and let it to be zero:
+\begin{eqnarray}
+\begin{array}{lll}
+    2 D^T(DM-X) - Z_4 + \mu(M-Y) = 0 \nonumber \\\\
+    2 D^TD\cdot M + \mu M = Z_4+\mu Y + 2D^TX\\\\
+    M = (2D^TD+\mu I)^{-1} \cdot (Z_4+\mu Y + 2D^TX)\\\\
+\end{array}
+\end{eqnarray}
+Now we can get M.\\
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 5}:\;\;Fix $\mathop{D,Y,M,S,J,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{Q}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{Q} <Z_1,S-Q> + \frac{1}{2}\mu {\parallel S - Q \parallel}_F^2  \\
+    s.t. \;\; Q^TQ = I
+\end{array}
+\end{eqnarray}
+It equals to:
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\min}\limits_{Q} <Z_1,-Q> - \mu <S,Q>  \\
+    s.t. \;\; Q^TQ = I \\
+\end{array}
+\end{eqnarray}\\
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{lll}
+    \mathop{\max}\limits_{Q} <Q,\mu S+Z_1>  \\
+    s.t. \;\; Q^TQ = I
+\end{array}
+\end{eqnarray}\\
+Use the proposition of matrix:
+\end{flushleft}
+\textbf{The dual norm of the operator norm $\parallel \cdot \parallel$ in $\mathop{R^{m\times n}}$ is the nuclear norm ${\parallel \cdot \parallel}_{\ast}$.}\\
+\begin{eqnarray}
+\begin{array}{lll}
+    {\parallel X\parallel}_{\ast} := \mathop{\max}\limits_{Y} \{ <X, Y> \;\; : \;\; \parallel Y\parallel \leq 1 \}
+\end{array}
+\end{eqnarray}\\
+Now let $\mathop{X} = U\Sigma V^T $ be a \textbf{thin} singular value decomposition of the $m \times n$ matrix $\mathop{X}$,where $\mathop{U}$ is an $m \times n$ matrix and $U^T \cdot U=I$, but $U \cdot U^T \neq I$. V is an $n \times n$ orthogonal matrix which $V \cdot V^T=I$.\; $\mathop{\Sigma}$ is an $n\times n$ matrix.Let $Y :=U\cdot V^T $,$\parallel Y \parallel = 1$ and $Tr(Y^T \cdot X) = Tr(VU^T \cdot U\Sigma V^T)=Tr(\Sigma)={\parallel X\parallel}_{\ast}$. And can get $Y^T\cdot Y=I$.\\
+So from this derivation, We can also do a \textbf{thin} singular value decomposition of $\mu S+Z_1 $:\\
+\begin{eqnarray}
+\begin{array}{lll}
+\mathop{\mu S+Z_1 = U \Sigma V^T} \nonumber \\\\
+Q = U\cdot V^T
+\end{array}
+\end{eqnarray}
+
+\begin{flushleft}
+\textbf{Steps 6}:\;\;Fix $\mathop{D,Y,S,M,Q,Z_1,Z_2,Z_3,Z_4}$ to optimize $\mathop{J}$ and ignore the constant items, We can get:
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} <Z_2,S-J> + \frac{1}{2}\mu {\parallel S - J \parallel}_F^2  \\
+    s.t. \;\; J \geq 0\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} \frac{2}{\mu} <Z_2,S-J> + {\parallel S - J \parallel}_F^2  + \frac{1}{\mu}{\parallel Z_2\parallel}_F^2\\
+    s.t. \;\; J \geq 0\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    \mathop{\min}\limits_{J} {\parallel J-(S+ \frac{Z_2}{\mu} )\parallel}_F^2\\
+    s.t. \;\; J \geq 0\\
+\end{array}
+\end{eqnarray}
+$\Longleftrightarrow$
+\begin{eqnarray}
+\begin{array}{l}
+    J=\frac{1}{2}\cdot\ [abs(S+ \frac{Z_2}{\mu})+ (S+ \frac{Z_2}{\mu})]
+\end{array}
+\end{eqnarray}
+\end{flushleft}
+
+\begin{flushleft}
+\textbf{Steps 7}:\;\;Do some updates:
+\begin{eqnarray}
+\begin{array}{l}
+Z_1 = Z_1 + \mu \cdot (S-Q)\\\\
+Z_2 = Z_2 + \mu \cdot (S-J)\\\\
+Z_3 = Z_3 + \mu (AS - D)\\\\
+Z_4 = Z_4 + \mu (Y - M)\\\\
+$$ \mu=
+\begin{cases}
+\rho \times \mu & \mu \leq 10^{\;30}\\\\
+10^{\;30}         & \text {else}
+\end{cases}$$
+\end{array}
+\end{eqnarray}\\
+where $\rho = 1.1 $.
+\end{flushleft}
+
+\section{Termination Conditions}
+The algorithm will stop when the conditions are both satisfied:
+\begin{eqnarray}
+\begin{array}{l}
+\mathop{\parallel S-Q \parallel}_\infty < \varepsilon \\\\
+\mathop{\parallel S-J \parallel}_\infty < \varepsilon \\\\
+\mathop{\parallel Y-M \parallel}_\infty < \varepsilon \\\\
+\mathop{\parallel A\cdot S-D \parallel}_F < \varepsilon \times \mathop{\parallel A \parallel}_F
+\end{array}
+\end{eqnarray}\\
+where $\varepsilon = 10^{-8}$.\\
+
+\end{document}
